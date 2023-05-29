@@ -1,0 +1,45 @@
+.accordion {
+  button {
+    padding: 0px;
+    border: none;
+  }
+}
+
+.accordion.active {
+  button {
+    background-color: #00ccff;
+    color: #fff;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+.active_close {
+  padding: .5rem 0.75rem;
+  button {
+    color: #fff;
+  }
+}
+
+.listCircle {
+  li {
+    position: relative;
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      border: 0.5px solid #000;
+    }
+  }
+
+  li.active {
+    &::before {
+      background-color: #00ccff;
+      border: 0;
+    }
+  }
+}
