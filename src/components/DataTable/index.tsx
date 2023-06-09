@@ -13,6 +13,7 @@ import {
   Tooltip,
   Input,
 } from "@material-tailwind/react";
+import PaginatedItems from './Pagination';
 
 const TABLE_HEAD = ["Transaction", "Amount", "Date", "Status", "Account", ""];
 
@@ -77,7 +78,7 @@ interface DataTableType {
   tableHeading: string[]
 }
 
-export default function DataTable({ heading, description, isExport = false, tableHeading=[] }: DataTableType) {
+export default function DataTable({ heading, description, isExport = false, tableHeading = [] }: DataTableType) {
   return (
     <Card className="h-full w-full">
       <CardHeader floated={false} shadow={false} className="rounded-none">
@@ -92,7 +93,7 @@ export default function DataTable({ heading, description, isExport = false, tabl
           </div>
           <div className="flex w-full shrink-0 gap-2 md:w-max">
             <div className="w-full md:w-72">
-              <Input label="Search" icon={<HiMagnifyingGlass className="h-5 w-5" />} />
+              <Input color='gray' label="Search" icon={<HiMagnifyingGlass className="h-5 w-5" />} />
             </div>
             {
               isExport ?
@@ -104,16 +105,16 @@ export default function DataTable({ heading, description, isExport = false, tabl
           </div>
         </div>
       </CardHeader>
-      <CardBody className="overflow-scroll px-0">
+      <CardBody className="overflow-y-scroll px-0 pt-0 h-96 overflow-scroll">
         <table className="w-full min-w-max table-auto text-left">
-          <thead>
+          <thead className='sticky top-0 z-10 bg-blue-gray-50'>
             <tr>
               {tableHeading.map((head) => (
-                <th key={head} className="border-y border-blue-gray-100 bg-blue-gray-50/50 p-4">
+                <th key={head} className='p-4'>
                   <Typography
                     variant="small"
                     color="blue-gray"
-                    className="font-normal leading-none opacity-70"
+                    className="font-normal leading-none opacity-70 capitalize"
                   >
                     {head}
                   </Typography>
@@ -122,101 +123,13 @@ export default function DataTable({ heading, description, isExport = false, tabl
             </tr>
           </thead>
           <tbody>
-            {/* {TABLE_ROWS.map(
-              ({ img, name, amount, date, status, account, accountNumber, expiry }, index) => {
-                const isLast = index === TABLE_ROWS.length - 1;
-                const classes = isLast ? "p-4" : "p-4 border-b border-blue-gray-50";
 
-                return (
-                  <tr key={name}>
-                    <td className={classes}>
-                      <div className="flex items-center gap-3">
-                        <Avatar
-                          src={img}
-                          alt={name}
-                          size="md"
-                          className="border border-blue-gray-50 bg-blue-gray-50/50 object-contain p-1"
-                        />
-                        <Typography variant="small" color="blue-gray" className="font-bold">
-                          {name}
-                        </Typography>
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <Typography variant="small" color="blue-gray" className="font-normal">
-                        {amount}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <Typography variant="small" color="blue-gray" className="font-normal">
-                        {date}
-                      </Typography>
-                    </td>
-                    <td className={classes}>
-                      <div className="w-max">
-                        <Chip
-                          //   size="sm"
-                          //   variant="ghost"
-                          value={status}
-                          color={
-                            status === "paid" ? "green" : status === "pending" ? "amber" : "red"
-                          }
-                        />
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <div className="flex items-center gap-3">
-                        <div className="h-9 w-12 rounded-md border border-blue-gray-50 p-1">
-                          <Avatar
-                            src={
-                              account === "visa"
-                                ? "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/logos/visa.png"
-                                : "https://demos.creative-tim.com/test/corporate-ui-dashboard/assets/img/logos/mastercard.png"
-                            }
-                            size="sm"
-                            alt={account}
-                            // variant="square"
-                            className="h-full w-full object-contain p-1"
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal capitalize"
-                          >
-                            {account.split("-").join(" ")} {accountNumber}
-                          </Typography>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className="font-normal opacity-70"
-                          >
-                            {expiry}
-                          </Typography>
-                        </div>
-                      </div>
-                    </td>
-                    <td className={classes}>
-                      <Tooltip content="Edit User">
-                        <IconButton variant="text" color="blue-gray">
-                          <HiPencil className="h-4 w-4" />
-                        </IconButton>
-                      </Tooltip>
-                    </td>
-                  </tr>
-                );
-              },
-            )} */}
           </tbody>
         </table>
       </CardBody>
       <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-        <Button variant="outlined" color="blue-gray" size="sm">
-          Previous
-        </Button>
-        <div className="flex items-center gap-2">
-          <IconButton variant="outlined" color="blue-gray" size="sm">
+        {/* <div className="flex items-center gap-2"> */}
+        {/* <IconButton variant="outlined" color="blue-gray" size="sm">
             1
           </IconButton>
           <IconButton variant="text" color="blue-gray" size="sm">
@@ -236,11 +149,13 @@ export default function DataTable({ heading, description, isExport = false, tabl
           </IconButton>
           <IconButton variant="text" color="blue-gray" size="sm">
             10
-          </IconButton>
-        </div>
-        <Button variant="outlined" color="blue-gray" size="sm">
-          Next
-        </Button>
+          </IconButton> */}
+        {/* <Typography color="gray" className="font-normal">
+            Page <strong className="text-blue-gray-900">{1}</strong> of{" "}
+            <strong className="text-blue-gray-900">10</strong>
+          </Typography> */}
+        {/* </div> */}
+        <PaginatedItems itemsPerPage={5} items={[1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 1, 3, 4, 2, 1, 2, 4, 5, 7, 9, 2, 3, 1, 3, 4, 2, 1, 2, 4, 5, 7, 9, 2, 3, 1, 3, 4, 2, 1, 2, 4, 5, 7, 9]} />
       </CardFooter>
     </Card>
   );

@@ -6,6 +6,9 @@ import { useFormik } from "formik";
 import { object, string, array } from "yup";
 // import PhotoGallery from "./PhotoGallery";
 import axios from "axios";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+const baseUrl = import.meta.env.VITE_API_URL
 
 const options = [
   { id: "2", value: "chocolate", label: "Chocolate" },
@@ -16,9 +19,11 @@ const options = [
 
 const MyEditor = () => {
   const editor = useRef<Editor>(null)
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  // const [isOpen, setIsOpen] = useState<boolean>(false);
   // const [contentCb, setContentCb] = useState<any>()
   const [images, setImages] = useState<[]>([])
+
+  const token = useSelector((state: RootState) => state.auth.token)
   const {
     handleBlur,
     handleChange,
@@ -50,13 +55,13 @@ const MyEditor = () => {
   });
 
 
-  useEffect(() => {
-    (async () => {
-      const res = await axios.get('https://api.unsplash.com/search/photos?client_id=IJzE1M1qYTd4lZ9PH6et0Sg_tUHcnIGkunCRO3_eIOk&query=nature')
-      setImages(res.data.results)
-      console.log(res.data);
-    })()
-  }, [])
+  // useEffect(() => {
+  //   (async () => {
+  //     const res = await axios.get('https://api.unsplash.com/search/photos?client_id=IJzE1M1qYTd4lZ9PH6et0Sg_tUHcnIGkunCRO3_eIOk&query=nature')
+  //     setImages(res.data.results)
+  //     console.log(res.data);
+  //   })()
+  // }, [])
 
   useEffect(() => {
     const html = new DOMParser().parseFromString(values.content, "text/html");
@@ -129,7 +134,7 @@ const MyEditor = () => {
             value={values.content}
             init={{
               toolbar:
-                "fullscreen wordcount undo redo | bold italic underline strikethrough numlist bullist | fontfamily fontsize blocks searchreplace | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist codesample emoticons | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap emoticons | preview save print | insertfile image media pageembed template link anchor | a11ycheck ltr rtl | showcomments addcomment | footnotes | mergetags restoredraft",
+                "fullscreen wordcount undo redo | bold italic underline strikethrough numlist bullist | fontfamily fontsize blocks searchreplace | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist codesample emoticons | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap | preview save print | insertfile image media pageembed template link anchor | a11ycheck ltr rtl | showcomments addcomment | footnotes | mergetags restoredraft",
               plugins:
                 "image lists emoticons wordcount codesample table fullscreen searchreplace advlist autosave",
               menubar: "file edit view insert format tools table tc help",
@@ -148,24 +153,19 @@ const MyEditor = () => {
                 })
               },
               images_upload_handler: async (blob, progress) => {
-                console.log(blob.blob(), progress(11));
-
-                const res = await axios.post('http://localhost:5000/api/v1/blog/upload-image', {
-                  upload: blob.blob()
-                }, {
-                  headers: {
-                    Authorization: `Bearer ${'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MzEwOGM0YThhYWQ1NTljYTQ3NDYzNyIsImlhdCI6MTY4NTIwNDA4MH0.eADcEQu93r3x7tO7HY1LYWek3iOiCuRxxRCCPYxUzp0'}`,
-                    "Content-Type": "multipart/form-data"
-                  }
-                })
-
-                return new Promise((resolve, reject) => {
-                  if (res.status === 200) {
-                    resolve(res.data.url)
-                  } else {
-                    reject('Some thing went wrong')
-                  }
-                })
+                try {
+                  const res = await axios.post(baseUrl, {
+                    upload: blob.blob()
+                  }, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      "Content-Type": "multipart/form-data"
+                    }
+                  })
+                  return res.data.url
+                } catch (error) {
+                  return error
+                }
               }
             }}
           />

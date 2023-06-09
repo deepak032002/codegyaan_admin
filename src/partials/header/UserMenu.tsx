@@ -1,6 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Transition from "../../utils/Transition";
+import { useDispatch } from "react-redux";
+import { removeToken } from "../../redux/features/AuthSlice";
+import { toast } from "react-hot-toast";
 
 const UserAvatar =
   "https://cdn.pixabay.com/photo/2017/03/27/13/28/man-2178721__340.jpg";
@@ -10,7 +13,8 @@ function UserMenu() {
 
   const trigger = useRef<HTMLButtonElement>(null);
   const dropdown = useRef<HTMLDivElement>(null);
-
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }: any) => {
@@ -98,7 +102,12 @@ function UserMenu() {
               <Link
                 className="font-medium text-sm text-indigo-500 hover:text-indigo-600 flex items-center py-1 px-3"
                 to="/"
-                onClick={() => setDropdownOpen(!dropdownOpen)}
+                onClick={() => {
+                  dispatch(removeToken())
+                  setDropdownOpen(!dropdownOpen)
+                  toast.success('Successfully logout!')
+                  navigate('/auth')
+                }}
               >
                 Sign Out
               </Link>

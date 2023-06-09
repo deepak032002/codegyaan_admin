@@ -2,13 +2,24 @@ import React, { useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { loginProps } from "./interface";
-import { login } from "../../api/auth";
 import loginImage from "../../assets/login.png";
+import { AxiosResponse } from "axios";
+import { useCallOnEvent } from "../../hooks";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { setToken } from "../../redux/features/AuthSlice";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import { IoWarningOutline } from 'react-icons/io5'
 
 const Login: React.FC<loginProps> = () => {
+
+  const [{ data, error, isLoading }, fetch] = useCallOnEvent<AxiosResponse>('/user/login/', 'POST')
+  const token = useSelector((state: RootState) => state.auth.token)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const handleLogin = async (data: any) => {
-    const res = await login(data);
-    console.log(res.data);
+    fetch(data)
   };
 
   const validationSchema = Yup.object().shape({
@@ -31,7 +42,15 @@ const Login: React.FC<loginProps> = () => {
   });
 
   useEffect(() => {
-  }, []);
+    if (!token && data) {
+      toast.success('Successfully LoggedIn!')
+      dispatch(setToken({ token: data?.data.token }))
+    }
+  }, [data])
+
+  useEffect(() => {
+    if (token) navigate('/')
+  }, [token])
 
   return (
     <div className="relative grid grid-cols-2 flex-col justify-center overflow-hidden border w-full min-h-screen bg-slate-50 font-['Poppins']">
@@ -85,12 +104,24 @@ const Login: React.FC<loginProps> = () => {
               </span>
             </div>
             <div className="mt-6">
-              <button
-                type="submit"
-                className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#01b399] rounded-md hover:bg-[#01b399]  focus:outline-none focus:bg-[#01b399] "
-              >
-                Login
-              </button>
+              {
+                isLoading ?
+                  <button
+                    type="submit"
+                    disabled
+                    className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#01b399] rounded-md hover:bg-[#01b399]  focus:outline-none focus:bg-[#01b399] "
+                  >
+                    Loading...
+                  </button>
+                  :
+
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2 tracking-wide text-white transition-colors duration-200 transform bg-[#01b399] rounded-md hover:bg-[#01b399]  focus:outline-none focus:bg-[#01b399] "
+                  >
+                    Login
+                  </button>
+              }
             </div>
           </form>
         </div>
