@@ -5,7 +5,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { useFormik } from "formik";
 import { object, string, array } from "yup";
 // import PhotoGallery from "./PhotoGallery";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 const baseUrl = import.meta.env.VITE_API_URL
@@ -54,15 +54,6 @@ const MyEditor = () => {
     },
   });
 
-
-  // useEffect(() => {
-  //   (async () => {
-  //     const res = await axios.get('https://api.unsplash.com/search/photos?client_id=IJzE1M1qYTd4lZ9PH6et0Sg_tUHcnIGkunCRO3_eIOk&query=nature')
-  //     setImages(res.data.results)
-  //     console.log(res.data);
-  //   })()
-  // }, [])
-
   useEffect(() => {
     const html = new DOMParser().parseFromString(values.content, "text/html");
     const h1 = html.querySelector("h1");
@@ -73,53 +64,6 @@ const MyEditor = () => {
   const handleCreateOption = (inputValue: string) => {
     console.log(inputValue);
   };
-
-
-  const dialogConfig = {
-    title: 'Image Gallery',
-    body: {
-      type: 'panel',
-      items: [
-        {
-          type: 'grid',
-          columns: 6,
-          items: images.map((item: any, index) => {
-            return {
-              type: 'imagepreview',
-              name: `preview-${index}`,
-              height: '500px',
-              item:
-              {
-                url: 'asdfa',
-                zoom: 1.5
-              }
-            }
-          })
-        }
-      ]
-    },
-    buttons: [
-      {
-        type: 'cancel',
-        name: 'closeButton',
-        text: 'Cancel'
-      },
-      {
-        type: 'submit',
-        name: 'submitButton',
-        text: 'Do Cat Thing',
-        buttonType: 'primary'
-      }
-    ],
-    initialData: {
-      catdata: 'initial Cat',
-      isdog: false
-    },
-    onSubmit: () => {
-      console.log('Submit');
-
-    }
-  }
 
   return (
     <div className="editor">
@@ -134,7 +78,7 @@ const MyEditor = () => {
             value={values.content}
             init={{
               toolbar:
-                "fullscreen wordcount undo redo | bold italic underline strikethrough numlist bullist | fontfamily fontsize blocks searchreplace | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist codesample emoticons | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap | preview save print | insertfile image media pageembed template link anchor | a11ycheck ltr rtl | showcomments addcomment | footnotes | mergetags restoredraft",
+                "fullscreen wordcount undo redo | bold italic underline strikethrough numlist bullist | fontfamily fontsize blocks searchreplace | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist codesample emoticons | forecolor backcolor casechange permanentpen formatpainter removeformat | pagebreak | charmap | preview save print | insertfile image galleryUpload media pageembed template link anchor | a11ycheck ltr rtl | showcomments addcomment | footnotes | mergetags restoredraft",
               plugins:
                 "image lists emoticons wordcount codesample table fullscreen searchreplace advlist autosave",
               menubar: "file edit view insert format tools table tc help",
@@ -146,26 +90,65 @@ const MyEditor = () => {
               quickbars_selection_toolbar:
                 "bold italic | quicklink h2 h3 blockquote quickimage quicktable",
               autosave_ask_before_unload: true,
-              setup: (editor) => {
-                editor.ui.registry.addButton('image-gallery', {
-                  icon: 'image',
-                  onAction: () => editor.windowManager.open(dialogConfig as any)
-                })
-              },
               images_upload_handler: async (blob, progress) => {
                 try {
-                  const res = await axios.post(baseUrl, {
+                  const res = await axios.post(`${baseUrl}/blog/upload-image`, {
                     upload: blob.blob()
                   }, {
                     headers: {
                       Authorization: `Bearer ${token}`,
                       "Content-Type": "multipart/form-data"
+                    },
+                    onUploadProgress: (progressEvent) => {
+                      const { loaded, total } = progressEvent;
+                      const percent = Math.floor((loaded * 100) / (total || 1));
+                      console.log(progressEvent);
+
+                      console.log(`${loaded} bytes of ${total} bytes. ${percent}%`);
+                      if (percent <= 100) {
+                        progress(percent)
+                      }
                     }
                   })
                   return res.data.url
                 } catch (error) {
                   return error
                 }
+              },
+              setup: (editor) => {
+                editor.ui.registry.addButton('galleryUpload', {
+                  icon: 'gallery',
+                  tooltip: 'Uploader',
+                  onAction: (_) => {
+                    // const a = window.cloudinary.openUploadWidget({
+                    //   cloudName: 'dn9mifnsi',
+                    //   uploadPreset: 'ml_default',
+                    //   maxImageWidth: 600,
+                    //   sources: ["local", "url", "camera"]
+                    // },
+                    //   function (error: any, result: any) {
+                    //     console.log(error, result);
+
+                    //   }).open()
+
+
+                    const mloptions = {
+                      cloud_name: 'dn9mifnsi',
+                      api_key: '838995219365944',
+                      folder: "code_gyaan"
+                    }
+
+                    const trigger = window.cloudinary.createMediaLibrary(mloptions, {
+                      insertHandler: (data) => {
+                        console.log(data);
+                      }
+                    })
+
+                    trigger.show()
+                  }
+                })
+
+
               }
             }}
           />

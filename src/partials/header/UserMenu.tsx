@@ -1,15 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Transition from "../../utils/Transition";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { removeToken } from "../../redux/features/AuthSlice";
 import { toast } from "react-hot-toast";
-
-const UserAvatar =
-  "https://cdn.pixabay.com/photo/2017/03/27/13/28/man-2178721__340.jpg";
+import { RootState } from "../../redux/store";
 
 function UserMenu() {
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const user = useSelector((state: RootState) => state.auth.userData);
 
   const trigger = useRef<HTMLButtonElement>(null);
   const dropdown = useRef<HTMLDivElement>(null);
@@ -51,14 +50,14 @@ function UserMenu() {
       >
         <img
           className="w-8 h-8 rounded-full"
-          src={UserAvatar}
+          src={user.avtar}
           width="32"
           height="32"
           alt="User"
         />
         <div className="flex items-center truncate">
           <span className="truncate ml-2 text-sm font-medium group-hover:text-slate-800">
-            Admin
+            {user.name}
           </span>
           <svg
             className="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400"
@@ -85,8 +84,8 @@ function UserMenu() {
           onBlur={() => setDropdownOpen(false)}
         >
           <div className="pt-0.5 pb-2 px-3 mb-1 border-b border-slate-200">
-            <div className="font-medium text-slate-800">Acme Inc.</div>
-            <div className="text-xs text-slate-500 italic">Administrator</div>
+            <div className="font-medium text-slate-800">{user.name}</div>
+            <div className="text-xs text-slate-500 italic">{user.role}</div>
           </div>
           <ul>
             <li>
