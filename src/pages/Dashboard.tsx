@@ -7,6 +7,7 @@ import { setUserData } from "../redux/features/AuthSlice";
 const Dashboard = () => {
 
   const token = useSelector((state: RootState) => state.auth.token)
+  
   const dispatch = useDispatch()
   const { isLoading, data } = useGetUserQuery(token)
 

@@ -1,7 +1,11 @@
 import React from "react";
 
 const Users = () => {
-  return <div className="">Users</div>;
+  return (
+    <div className="">
+      {/* <Posts /> */}
+    </div>
+  );
 };
 
 export default Users;

@@ -1,45 +1,41 @@
-import { Button } from '@material-tailwind/react';
-import { useState } from 'react';
-import ReactPaginate from 'react-paginate';
+import { Button } from "@material-tailwind/react";
+import { useState } from "react";
+import ReactPaginate from "react-paginate";
+import { PaginatedItemsProps } from "./interface";
 
+const PaginatedItems: React.FC<PaginatedItemsProps> = ({
+  itemsPerPage,
+  items,
+  handlePageClick,
+}) => {
+  const pageCount = Math.ceil(items?.length / itemsPerPage);
 
-function PaginatedItems({ itemsPerPage, items }: { itemsPerPage: number, items: number[] }) {
-    const [itemOffset, setItemOffset] = useState<number>(0);
+  return (
+    <>
+      <ReactPaginate
+        breakLabel="..."
+        nextLabel={
+          <Button variant="outlined" color="blue-gray" size="sm">
+            Next
+          </Button>
+        }
+        onPageChange={handlePageClick}
+        pageRangeDisplayed={5}
+        pageCount={pageCount}
+        previousLabel={
+          <Button variant="outlined" color="blue-gray" size="sm">
+            Previous
+          </Button>
+        }
+        className="flex justify-between items-center w-full"
+        activeClassName="bg-blue-500 h-5 w-5 flex justify-center items-center p-4 rounded-full text-white"
+        disabledLinkClassName="block h-full rounded-lg pointer-events-none select-none bg-gray-400"
+        previousClassName="pr-16"
+        nextClassName="pl-16"
+        renderOnZeroPageCount={null}
+      />
+    </>
+  );
+};
 
-    const endOffset = itemOffset + itemsPerPage;
-    const currentItems = items?.slice(itemOffset, endOffset);
-    const pageCount = Math.ceil(items?.length / itemsPerPage);
-    const handlePageClick = (event: any) => {
-        const newOffset = (event.selected * itemsPerPage) % items.length;
-        console.log(
-            `User requested page number ${event.selected}, which is offset ${newOffset}`
-        );
-        setItemOffset(newOffset);
-    };
-
-    return (
-        <>
-            <ReactPaginate
-                breakLabel="..."
-                nextLabel={
-                    <Button variant="outlined" color="blue-gray" size="sm">
-                        Next
-                    </Button>}
-                onPageChange={handlePageClick}
-                pageRangeDisplayed={2}
-                pageCount={pageCount}
-                previousLabel={
-                    <Button variant="outlined" color="blue-gray" size="sm">
-                        Previous
-                    </Button>
-                }
-                className='flex justify-between items-center w-full'
-                previousClassName='pr-16'
-                nextClassName='pl-16'
-                renderOnZeroPageCount={null}
-            />
-        </>
-    );
-}
-
-export default PaginatedItems
+export default PaginatedItems;
