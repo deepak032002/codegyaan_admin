@@ -11,6 +11,7 @@ import {
 } from "@material-tailwind/react";
 import PaginatedItems from "./Pagination";
 import { DataTableProps } from "./interface";
+import React from "react";
 
 export default function DataTable({
   heading,
@@ -71,7 +72,7 @@ export default function DataTable({
             </tr>
           </thead>
           <tbody>
-            {tableData.map((item: { [key: string]: any }, index: number) => {
+            {tableData.map((item: { [key: string]: any }) => {
               return (
                 <tr key={item.id} className="cursor-pointer">
                   {Object.values(item).map((Children, idx) => {
@@ -84,7 +85,7 @@ export default function DataTable({
                         <Children />
                       </td>
                     ) : (
-                      <></>
+                      <React.Fragment key={idx}></React.Fragment>
                     );
                   })}
                 </tr>

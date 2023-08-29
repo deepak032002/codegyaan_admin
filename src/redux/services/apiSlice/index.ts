@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BlogData, CategoryProps, LoginProps, TagProps, UserProps } from '../../../types/apislice'
+import formDataSerializer from '../../../utils/formDataSerializer';
 const baseUrl = import.meta.env.VITE_API_URL as string
 
 // Auth services
@@ -17,8 +18,8 @@ export const authServices = createApi({
       }
     }),
 
-    getUser: builder.query<UserProps, string>({
-      query: (token) => {        
+    getUser: builder.query<UserProps, { token: string }>({
+      query: ({ token }) => {
         return {
           url: '/user',
           method: 'GET',
@@ -51,8 +52,8 @@ export const categoryServices = createApi({
       }
     }),
 
-    getCategories: builder.query<CategoryProps, string>({
-      query: (token) => {
+    getCategories: builder.query<CategoryProps, { token: string }>({
+      query: ({ token }) => {
         return {
           url: '/category',
           method: 'GET',
@@ -85,8 +86,8 @@ export const tagServices = createApi({
       }
     }),
 
-    getTags: builder.query<TagProps, string>({
-      query: (token) => {
+    getTags: builder.query<TagProps, { token: string }>({
+      query: ({ token }) => {
         return {
           url: '/tag',
           method: 'GET',
@@ -106,38 +107,52 @@ export const blogServices = createApi({
   reducerPath: 'blogServices',
   baseQuery: fetchBaseQuery({ baseUrl }),
   endpoints: (builder) => ({
-    createBlog: builder.mutation<BlogData, { data: BlogData; token: string }>({
+    createBlog: builder.mutation<BlogData, { data: any; token: string }>({
       query: ({ data, token }) => {
+        const formData = formDataSerializer(data)
         return {
           url: `/blog`,
           method: 'POST',
-          body: data,
+          body: formData,
           headers: {
-            authorization: `Bearer ${token}`
-          }
+            authorization: `Bearer ${token}`,
+          },
+          formData: true
         }
       }
     }),
 
-    getBlog: builder.query<BlogData, string>({
-      query: (token) => {
+    getBlog: builder.query<BlogData, { token: string }>({
+      query: (payload) => {
         return {
           url: '/blog',
           method: 'GET',
           headers: {
-            authorization: `Bearer ${token}`
+            authorization: `Bearer ${payload.token}`
           }
         }
       }
     }),
 
-    getBlogBySlug: builder.query<BlogData, string>({
-      query: (token) => {
+    getBlogBySlug: builder.query<BlogData, { token: string }>({
+      query: (payload) => {
         return {
           url: '/blog/:slug',
           method: 'GET',
           headers: {
-            authorization: `Bearer ${token}`
+            authorization: `Bearer ${payload.token}`
+          }
+        }
+      }
+    }),
+
+    publishBlog: builder.mutation<BlogData, { token: string, id: string }>({
+      query: (payload) => {
+        return {
+          url: `/blog/${payload.id}`,
+          method: 'PATCH',
+          headers: {
+            authorization: `Bearer ${payload.token}`
           }
         }
       }
@@ -145,4 +160,4 @@ export const blogServices = createApi({
   })
 })
 
-export const { useCreateBlogMutation, useGetBlogBySlugQuery, useGetBlogQuery } = blogServices
+export const { useCreateBlogMutation, useGetBlogBySlugQuery, useGetBlogQuery, usePublishBlogMutation } = blogServices

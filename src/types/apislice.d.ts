@@ -37,6 +37,8 @@ export interface Blogs {
   is_published: boolean;
 }
 export interface BlogData {
-  blogs: Blogs[];
+  results: Blogs[];
+  page: number,
+  total: number,
   message: string;
 }
