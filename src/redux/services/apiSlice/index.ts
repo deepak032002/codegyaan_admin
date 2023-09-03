@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { BlogData, CategoryProps, LoginProps, TagProps, UserProps } from '../../../types/apislice'
+import { Blog, BlogData, CategoryProps, LoginProps, SingleBlogData, TagProps, UserProps } from '../../../types/apislice'
 import formDataSerializer from '../../../utils/formDataSerializer';
 const baseUrl = import.meta.env.VITE_API_URL as string
 
@@ -122,10 +122,25 @@ export const blogServices = createApi({
       }
     }),
 
-    getBlog: builder.query<BlogData, { token: string }>({
+    updateBlog: builder.mutation<{ message: string, blog: Blog }, { data: any; token: string, slug: string }>({
+      query: ({ data, token, slug }) => {
+        const formData = formDataSerializer(data)
+        return {
+          url: `/blog/${slug}`,
+          method: 'PATCH',
+          body: formData,
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          formData: true,
+        }
+      }
+    }),
+
+    getBlog: builder.query<BlogData, { token: string, page?: number, per_page_items?: number, query?: string }>({
       query: (payload) => {
         return {
-          url: '/blog',
+          url: `/blog/?page=${payload.page || 1}&item_per_page=${payload.per_page_items || 10}&search=${payload.query || ""}`,
           method: 'GET',
           headers: {
             authorization: `Bearer ${payload.token}`
@@ -134,10 +149,10 @@ export const blogServices = createApi({
       }
     }),
 
-    getBlogBySlug: builder.query<BlogData, { token: string }>({
+    getBlogBySlug: builder.query<SingleBlogData, { token: string, slug: string }>({
       query: (payload) => {
         return {
-          url: '/blog/:slug',
+          url: `/blog/${payload.slug}`,
           method: 'GET',
           headers: {
             authorization: `Bearer ${payload.token}`
@@ -149,7 +164,7 @@ export const blogServices = createApi({
     publishBlog: builder.mutation<BlogData, { token: string, id: string }>({
       query: (payload) => {
         return {
-          url: `/blog/${payload.id}`,
+          url: `/blog/publish-blog/${payload.id}`,
           method: 'PATCH',
           headers: {
             authorization: `Bearer ${payload.token}`
@@ -160,4 +175,4 @@ export const blogServices = createApi({
   })
 })
 
-export const { useCreateBlogMutation, useGetBlogBySlugQuery, useGetBlogQuery, usePublishBlogMutation } = blogServices
+export const { useCreateBlogMutation, useGetBlogBySlugQuery, useGetBlogQuery, usePublishBlogMutation, useUpdateBlogMutation } = blogServices

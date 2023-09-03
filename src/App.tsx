@@ -1,28 +1,26 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "./partials/Sidebar";
 import Header from "./partials/Header";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import routes from "./partials/routes";
 import "./App.scss";
 import { useSelector } from "react-redux";
 import { RootState } from "./redux/store";
+import Four0Four from "./components/ErrorPage/404";
 
 const App = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate()
-  const token = useSelector((state: RootState) => state.auth.token)
+  const navigate = useNavigate();
+  const token = useSelector((state: RootState) => state.auth.token);
 
   useEffect(() => {
-    if (!token) navigate('/auth')
-  }, [token])
+    if (!token) navigate("/auth");
+  }, [token]);
 
-  const location = useLocation();
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
-      {location.pathname !== "/posts/create" && (
-        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      )}
+      <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
         <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
@@ -51,6 +49,8 @@ const App = () => {
                   </React.Fragment>
                 );
               })}
+
+              <Route path="*" element={<Four0Four />} />
             </Routes>
           </div>
         </main>

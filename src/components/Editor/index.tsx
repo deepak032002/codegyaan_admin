@@ -6,26 +6,36 @@ import { useFormik } from "formik";
 import { object, string, array } from "yup";
 // import PhotoGallery from "./PhotoGallery";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import {
   useCreateBlogMutation,
-  useCreateCategoryMutation,
+  useGetBlogQuery,
+  // useCreateCategoryMutation,
   useGetCategoriesQuery,
   useGetTagsQuery,
+  useUpdateBlogMutation,
 } from "../../redux/services/apiSlice";
 import ImageUploader from "../ImageUploader";
+import { Blog } from "../../types/apislice";
+import { getPatchObject } from "../../utils/getPatchObject";
+import { toast } from "react-hot-toast";
+import { setIsLoad } from "../../redux/features/LoaderSlice";
+import { useNavigate } from "react-router-dom";
 const baseUrl = import.meta.env.VITE_API_URL;
 
-const MyEditor = () => {
+const MyEditor = ({ fetchedData }: { fetchedData: Blog }) => {
   const token = useSelector((state: RootState) => state.auth.token);
-  const [createBlog, data] = useCreateBlogMutation();
-  const editor = useRef<Editor>(null);
-  // const [isOpen, setIsOpen] = useState<boolean>(false);
-  // const [contentCb, setContentCb] = useState<any>()
 
-  const category = useGetCategoriesQuery({token});
-  const tag = useGetTagsQuery({token});
+  const [createBlog] = useCreateBlogMutation();
+  const [updateBlog] = useUpdateBlogMutation();
+  const category = useGetCategoriesQuery({ token });
+  const { refetch } = useGetBlogQuery({ token });
+
+  const editor = useRef<Editor>(null);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const tag = useGetTagsQuery({ token });
 
   const {
     handleBlur,
@@ -35,16 +45,21 @@ const MyEditor = () => {
     touched,
     setFieldValue,
     handleSubmit,
-  } = useFormik({
+    setValues,
+  } = useFormik<Blog>({
     initialValues: {
       title: "",
       description: "",
       content: "",
-      category: "",
+      category: { _id: "", name: "" },
       meta_title: "",
       meta_description: "",
       banner: "",
       tags: [],
+      author: { name: "", avtar: "", email: "" },
+      is_published: false,
+      slug: "",
+      createdAt: "",
     },
 
     validationSchema: object({
@@ -53,27 +68,76 @@ const MyEditor = () => {
       meta_description: string().required("Meta Description is required"),
       meta_title: string().required("Meta Title is required"),
       content: string().required("Content is required"),
-      category: string().required("Category is required"),
+      category: object().nonNullable(),
       tags: array().max(3, "Maximum 3 tags").min(1, "Minimum 1 tag"),
     }),
 
-    onSubmit: (values) => {
-      createBlog({ data: values, token: token });
+    onSubmit: async (values) => {
+      dispatch(setIsLoad(true));
+      if (fetchedData) {
+        const data = getPatchObject(values, fetchedData);
+        const newData: { [key: string]: any } = { ...data };
+
+        if (data?.category) {
+          newData.category = data.category._id;
+        }
+
+        if (data?.tags) {
+          newData.tags = data.tags.map((item) => item._id);
+        }
+
+        updateBlog({
+          data: newData,
+          token: token,
+          slug: values.slug,
+        })
+          .unwrap()
+          .then((data) => {
+            console.log(data);
+            dispatch(setIsLoad(false));
+            toast.success(data.message);
+            if (data.blog.slug !== values.slug) {
+              navigate("/posts/all");
+              refetch();
+            }
+          })
+          .catch((err) => {
+            dispatch(setIsLoad(false));
+            toast.error(err.data.message);
+            console.log(err);
+          });
+      } else {
+        createBlog({ data: values, token: token })
+          .unwrap()
+          .then((data) => {
+            dispatch(setIsLoad(false));
+            toast.success(data.message);
+          })
+          .catch((err) => {
+            dispatch(setIsLoad(false));
+            toast.error(err.data.message);
+            console.log(err);
+          });
+      }
     },
   });
 
   useEffect(() => {
-    const html = new DOMParser().parseFromString(values.content, "text/html");
-    const h1 = html.querySelector("h1");
-    const h1Text = h1 ? h1.innerText : "";
-    setFieldValue("title", h1Text);
-  }, [values.content]);
+    if (fetchedData) setValues(fetchedData);
+  }, [fetchedData]);
+
+  // useEffect(() => {
+  //   const html = new DOMParser().parseFromString(values.content, "text/html");
+  //   const h1 = html.querySelector("h1");
+  //   const h1Text = h1 ? h1.innerText : "";
+  //   setFieldValue("title", h1Text);
+  // }, [values.content]);
 
   return (
     <div className="editor">
       <form onSubmit={handleSubmit} className="mb-2">
         <div className="grid grid-cols-12 gap-2">
-          <div className="md:col-span-9 col-span-12">
+          <div className="col-span-12">
             <Editor
               ref={editor}
               apiKey="bk4525mq1cq90gtb85qarmtdv6gugjza50rzu5qbx73fg0hc"
@@ -89,7 +153,7 @@ const MyEditor = () => {
                 menubar: "file edit view insert format tools table tc help",
                 file_picker_types: "file image media",
                 image_caption: true,
-                image_advtab: true, 
+                image_advtab: true,
                 height: 500,
                 browser_spellcheck: true,
                 quickbars_selection_toolbar:
@@ -112,7 +176,6 @@ const MyEditor = () => {
                           const percent = Math.floor(
                             (loaded * 100) / (total || 1)
                           );
-                          console.log(progressEvent);
 
                           console.log(
                             `${loaded} bytes of ${total} bytes. ${percent}%`
@@ -171,7 +234,7 @@ const MyEditor = () => {
             </span>
           </div>
 
-          <div className="md:col-span-3 col-span-12 md:pt-0 pt-6">
+          <div className="col-span-12 md:pt-0 pt-6">
             <Card color="transparent" shadow={false}>
               <div className="mb-4 flex flex-col gap-6">
                 <div>
@@ -244,21 +307,28 @@ const MyEditor = () => {
 
                 <div>
                   <Select
-                    options={category?.data?.categories.map((item) => ({
+                    options={category.data?.categories.map((item) => ({
                       value: item._id,
-                      label: item.name.toUpperCase(),
+                      label: item.name,
                     }))}
                     placeholder="Category"
                     name="category"
                     isClearable
                     onChange={(value) =>
-                      setFieldValue("category", value?.value)
+                      setFieldValue("category", {
+                        _id: value?.value,
+                        name: value?.label,
+                      })
                     }
+                    value={{
+                      value: values.category._id,
+                      label: values.category.name,
+                    }}
                     onBlur={handleBlur}
                   />
-                  <span className="text-xs text-red-500">
+                  {/* <span className="text-xs text-red-500">
                     {touched.category && errors.category ? errors.category : ""}
-                  </span>
+                  </span> */}
                 </div>
                 <div>
                   <Select
@@ -269,15 +339,22 @@ const MyEditor = () => {
                     isMulti
                     placeholder="Tags"
                     onBlur={handleBlur}
+                    value={values.tags.map((item) => ({
+                      value: item._id,
+                      label: item.name.toUpperCase(),
+                    }))}
                     onChange={(value) =>
                       setFieldValue(
                         "tags",
-                        value.map((item) => item.value)
+                        value.map((item) => ({
+                          _id: item.value,
+                          name: item.label,
+                        }))
                       )
                     }
                   />
                   <span className="text-xs text-red-500">
-                    {touched.tags && errors.tags ? errors.tags : ""}
+                    {touched.tags && errors.tags ? (errors.tags as string) : ""}
                   </span>
                 </div>
               </div>

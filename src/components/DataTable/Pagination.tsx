@@ -1,37 +1,29 @@
-import { Button } from "@material-tailwind/react";
-import { useState } from "react";
 import ReactPaginate from "react-paginate";
 import { PaginatedItemsProps } from "./interface";
+import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 
 const PaginatedItems: React.FC<PaginatedItemsProps> = ({
   itemsPerPage,
   items,
   handlePageClick,
 }) => {
-  const pageCount = Math.ceil(items?.length / itemsPerPage);
+  const pageCount = Math.ceil(items / itemsPerPage);
 
   return (
     <>
       <ReactPaginate
         breakLabel="..."
-        nextLabel={
-          <Button variant="outlined" color="blue-gray" size="sm">
-            Next
-          </Button>
-        }
+        previousLabel={<GoChevronLeft fontSize={28} />}
+        nextLabel={<GoChevronRight fontSize={28} />}
         onPageChange={handlePageClick}
-        pageRangeDisplayed={5}
+        pageRangeDisplayed={1}
         pageCount={pageCount}
-        previousLabel={
-          <Button variant="outlined" color="blue-gray" size="sm">
-            Previous
-          </Button>
-        }
-        className="flex justify-between items-center w-full"
+        className="flex gap-4 justify-end items-center w-full"
+        pageClassName="h-5 w-5 rounded-full flex justify-center items-center p-4 hover:bg-gray-200 hover:text-inherit"
         activeClassName="bg-blue-500 h-5 w-5 flex justify-center items-center p-4 rounded-full text-white"
-        disabledLinkClassName="block h-full rounded-lg pointer-events-none select-none bg-gray-400"
-        previousClassName="pr-16"
-        nextClassName="pl-16"
+        disabledLinkClassName="block h-full rounded-full text-gray-300 pointer-events-none select-none bg-gray-400"
+        previousClassName=""
+        nextClassName=""
         renderOnZeroPageCount={null}
       />
     </>

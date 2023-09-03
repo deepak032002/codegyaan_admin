@@ -8,3 +8,4 @@ export interface AuthProps {
   token: string;
   userData: UserData;
 }
+

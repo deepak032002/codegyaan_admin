@@ -9,7 +9,7 @@ const Dashboard = () => {
   const token = useSelector((state: RootState) => state.auth.token)
   
   const dispatch = useDispatch()
-  const { isLoading, data } = useGetUserQuery(token)
+  const { isLoading, data } = useGetUserQuery({token})
 
   useEffect(() => {
     if (data) dispatch(setUserData(data.userData))

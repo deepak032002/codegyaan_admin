@@ -214,26 +214,31 @@ function Sidebar({ sidebarOpen, setSidebarOpen }: any) {
                             <ul className={`pl-9 mt-1 listCircle`}>
                               {item.child?.map((child, index) => {
                                 return (
-                                  <li
-                                    className={`px-3 py-2 rounded-sm mb-0.5 last:mb-0 ${
-                                      pathname ===
-                                        `${item.path}${child.path}` && "active"
-                                    }`}
-                                    key={index}
-                                  >
-                                    <NavLink
-                                      to={`${item.path}${child.path}`}
-                                      className={`block truncate transition duration-150 ${
-                                        pathname.includes(child.path) && "hover"
-                                      }`}
-                                    >
-                                      <div className="flex items-center">
-                                        <span className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
-                                          {child.name}
-                                        </span>
-                                      </div>
-                                    </NavLink>
-                                  </li>
+                                  <React.Fragment key={index}>
+                                    {child.name && (
+                                      <li
+                                        className={`px-3 py-2 rounded-sm mb-0.5 last:mb-0 ${
+                                          pathname ===
+                                            `${item.path}${child.path}` &&
+                                          "active"
+                                        }`}
+                                      >
+                                        <NavLink
+                                          to={`${item.path}${child.path}`}
+                                          className={`block truncate transition duration-150 ${
+                                            pathname.includes(child.path) &&
+                                            "hover"
+                                          }`}
+                                        >
+                                          <div className="flex items-center">
+                                            <span className="text-sm font-medium ml-3 lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
+                                              {child.name}
+                                            </span>
+                                          </div>
+                                        </NavLink>
+                                      </li>
+                                    )}
+                                  </React.Fragment>
                                 );
                               })}
                             </ul>

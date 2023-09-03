@@ -4,14 +4,14 @@ import { Dashboard, PostCreate, Posts, Users } from "../pages";
 
 interface Child {
   path: string;
-  name: string;
+  name?: string;
   element: () => JSX.Element;
 }
 
 interface RouteWithoutChild {
   path: string;
   icon: IconType;
-  name: string;
+  name?: string;
   isHaveChild: false;
   element: () => JSX.Element;
   child?: undefined;
@@ -20,7 +20,7 @@ interface RouteWithoutChild {
 interface RouteWithChild {
   path: string;
   icon?: IconType;
-  name: string;
+  name?: string;
   isHaveChild: true;
   element?: undefined;
   child: Child[];
@@ -51,6 +51,10 @@ let routes: Route[] = [
       {
         path: "/create",
         name: "Create Post",
+        element: PostCreate,
+      },
+      {
+        path: "/edit/:postId",
         element: PostCreate,
       },
     ],

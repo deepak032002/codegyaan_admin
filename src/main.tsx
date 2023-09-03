@@ -9,6 +9,9 @@ import { PersistGate } from "redux-persist/integration/react";
 import "./index.scss";
 import { persistor, store } from "./redux/store";
 import { Toaster } from "react-hot-toast";
+import ErrorBoundary from "./ErrorBoundary";
+import Five00 from "./components/ErrorPage/500";
+import Loader from "./components/Loader";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -16,18 +19,21 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <PersistGate persistor={persistor}>
-        <ThemeProvider>
-          <Toaster />
-          <Router>
-            <Routes>
-              <Route path="/auth" element={<Login />} />
-              <Route path="/*" element={<App />} />
-            </Routes>
-          </Router>
-        </ThemeProvider>
-      </PersistGate>
-    </Provider>
+    <ErrorBoundary fallback={<Five00 />}>
+      <Provider store={store}>
+        <PersistGate persistor={persistor}>
+          <ThemeProvider>
+            <Toaster />
+            <Loader />
+            <Router>
+              <Routes>
+                <Route path="/auth" element={<Login />} />
+                <Route path="/*" element={<App />} />
+              </Routes>
+            </Router>
+          </ThemeProvider>
+        </PersistGate>
+      </Provider>
+    </ErrorBoundary>
   </React.StrictMode>
 );

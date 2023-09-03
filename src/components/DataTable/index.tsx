@@ -8,10 +8,17 @@ import {
   CardBody,
   CardFooter,
   Input,
+  Menu,
+  MenuHandler,
+  MenuList,
+  MenuItem,
+  IconButton,
 } from "@material-tailwind/react";
 import PaginatedItems from "./Pagination";
 import { DataTableProps } from "./interface";
 import React from "react";
+import { CiMenuKebab } from "react-icons/ci";
+import { Link } from "react-router-dom";
 
 export default function DataTable({
   heading,
@@ -19,6 +26,10 @@ export default function DataTable({
   isExport = false,
   tableHeading = [],
   tableData = [],
+  totalItems,
+  handlePageClick,
+  handleSearch,
+  query,
 }: DataTableProps) {
   return (
     <Card className="h-full w-full">
@@ -37,6 +48,8 @@ export default function DataTable({
               <Input
                 color="gray"
                 label="Search"
+                value={query}
+                onChange={handleSearch}
                 icon={<HiMagnifyingGlass className="h-5 w-5" />}
               />
             </div>
@@ -58,36 +71,69 @@ export default function DataTable({
         <table className="w-full min-w-max table-auto text-left">
           <thead className="sticky top-0 z-10 bg-blue-gray-50">
             <tr>
-              {tableHeading.map((head) => (
-                <th key={head} className="p-4">
-                  <Typography
-                    variant="small"
-                    color="blue-gray"
-                    className="font-normal leading-none opacity-70 capitalize"
+              {tableHeading.map((head) => {
+                return (
+                  <th
+                    key={head.key}
+                    style={{ width: head.width }}
+                    className="p-4"
                   >
-                    {head}
-                  </Typography>
-                </th>
-              ))}
+                    <Typography
+                      variant="small"
+                      color="blue-gray"
+                      className="font-normal leading-none opacity-70 capitalize"
+                    >
+                      {head.key}
+                    </Typography>
+                  </th>
+                );
+              })}
+
+              <th className="p-4">
+                <Typography
+                  variant="small"
+                  color="blue-gray"
+                  className="font-normal leading-none opacity-70 capitalize"
+                >
+                  Action
+                </Typography>
+              </th>
             </tr>
           </thead>
           <tbody>
             {tableData.map((item: { [key: string]: any }) => {
               return (
-                <tr key={item.id} className="cursor-pointer">
+                <tr key={item.id} className="hover:bg-gray-100">
                   {Object.values(item).map((Children, idx) => {
-                    return typeof Children !== "number" &&
-                      typeof Children !== "string" ? (
-                      <td
-                        className="p-4 border-b border-blue-gray-50"
-                        key={idx}
-                      >
-                        <Children />
-                      </td>
-                    ) : (
-                      <React.Fragment key={idx}></React.Fragment>
+                    return (
+                      <React.Fragment key={`${item.id}${idx}`}>
+                        {typeof Children !== "number" &&
+                        typeof Children !== "string" ? (
+                          <td className="p-4 border-b border-blue-gray-50">
+                            <Children />
+                          </td>
+                        ) : (
+                          <></>
+                        )}
+                      </React.Fragment>
                     );
                   })}
+
+                  <td className="p-4 border-b border-blue-gray-50">
+                    <Menu>
+                      <MenuHandler>
+                        <IconButton variant="text">
+                          <CiMenuKebab className="text-blue-gray-400 text-lg" />
+                        </IconButton>
+                      </MenuHandler>
+                      <MenuList>
+                        <MenuItem>
+                          <Link to={item.url}>Edit</Link>
+                        </MenuItem>
+                        <MenuItem>Delete</MenuItem>
+                      </MenuList>
+                    </Menu>
+                  </td>
                 </tr>
               );
             })}
@@ -96,9 +142,9 @@ export default function DataTable({
       </CardBody>
       <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
         <PaginatedItems
-          handlePageClick={() => {}}
-          itemsPerPage={5}
-          items={Array.from(Array(200))}
+          handlePageClick={handlePageClick}
+          itemsPerPage={10}
+          items={totalItems}
         />
       </CardFooter>
     </Card>

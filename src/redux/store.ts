@@ -6,7 +6,7 @@ import { setupListeners } from '@reduxjs/toolkit/dist/query'
 import { authServices, categoryServices, tagServices, blogServices } from './services/apiSlice'
 const persistConfig = {
   key: 'codegyaan',
-  blacklist: ['authServices', 'categoryServices', 'tagServices', 'blogServices'],
+  blacklist: ['authServices', 'categoryServices', 'tagServices', 'blogServices', 'loader'],
   storage
 }
 
