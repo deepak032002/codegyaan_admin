@@ -67,7 +67,7 @@ export default function DataTable({
           </div>
         </div>
       </CardHeader>
-      <CardBody className="overflow-y-scroll px-0 pt-0 h-96 overflow-scroll">
+      <CardBody className="overflow-y-scroll px-0 pt-0 table-wrapper">
         <table className="w-full min-w-max table-auto text-left">
           <thead className="sticky top-0 z-10 bg-blue-gray-50">
             <tr>

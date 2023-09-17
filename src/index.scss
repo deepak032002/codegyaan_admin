@@ -4,14 +4,13 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
+.table-wrapper {
   &::-webkit-scrollbar {
-    width: 0px;
+    height: 2px;
     background-color: rgba(255, 0, 0, 0);
   }
 
   &::-webkit-scrollbar-thumb{
-    width: 100%;
     background-color: rgb(128, 128, 128);
   }
 }

@@ -50,16 +50,9 @@ const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         aria-hidden="true"
-        onClick={() => setSidebarOpen(prev => !prev)}
+        onClick={() => setSidebarOpen((prev) => !prev)}
       ></div>
 
-      {/* Sidebar */}
-      {/* {sidebarOpen && (
-        <div
-          className="backdrop left-0 top-0 absolute z-10 h-screen w-screen bg-[#00000000]"
-          onClick={() => setSidebarOpen((prev) => !prev)}
-        ></div>
-      )} */}
       <div
         id="sidebar"
         ref={sidebar}
