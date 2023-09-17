@@ -101,42 +101,56 @@ export default function DataTable({
             </tr>
           </thead>
           <tbody>
-            {tableData.map((item: { [key: string]: any }) => {
-              return (
-                <tr key={item.id} className="hover:bg-gray-100">
-                  {Object.values(item).map((Children, idx) => {
-                    return (
-                      <React.Fragment key={`${item.id}${idx}`}>
-                        {typeof Children !== "number" &&
-                        typeof Children !== "string" ? (
-                          <td className="p-4 border-b border-blue-gray-50">
-                            <Children />
-                          </td>
-                        ) : (
-                          <></>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
+            {tableData && tableData.length > 0 ? (
+              tableData.map((item: { [key: string]: any }) => {
+                return (
+                  <tr key={item.id} className="hover:bg-gray-100">
+                    {Object.values(item).map((Children, idx) => {
+                      return (
+                        <React.Fragment key={`${item.id}${idx}`}>
+                          {typeof Children !== "number" &&
+                          typeof Children !== "string" ? (
+                            <td className="p-4 border-b border-blue-gray-50">
+                              <Children />
+                            </td>
+                          ) : (
+                            <></>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
 
-                  <td className="p-4 border-b border-blue-gray-50">
-                    <Menu>
-                      <MenuHandler>
-                        <IconButton variant="text">
-                          <CiMenuKebab className="text-blue-gray-400 text-lg" />
-                        </IconButton>
-                      </MenuHandler>
-                      <MenuList>
-                        <MenuItem>
-                          <Link to={item.url}>Edit</Link>
-                        </MenuItem>
-                        <MenuItem>Delete</MenuItem>
-                      </MenuList>
-                    </Menu>
-                  </td>
-                </tr>
-              );
-            })}
+                    <td className="p-4 border-b border-blue-gray-50">
+                      <Menu>
+                        <MenuHandler>
+                          <IconButton variant="text">
+                            <CiMenuKebab className="text-blue-gray-400 text-lg" />
+                          </IconButton>
+                        </MenuHandler>
+                        <MenuList>
+                          <MenuItem>
+                            <Link to={item.url}>Edit</Link>
+                          </MenuItem>
+                          <MenuItem>Delete</MenuItem>
+                        </MenuList>
+                      </Menu>
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td className="p-4" colSpan={tableHeading.length + 1}>
+                  <Typography
+                    variant="small"
+                    color="blue-gray"
+                    className="font-normal leading-none opacity-70 capitalize text-center"
+                  >
+                    Data not available
+                  </Typography>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </CardBody>

@@ -11,7 +11,7 @@ export interface DataTableProps {
   description: string
   isExport: boolean
   tableHeading: { key: string; width: number | string }[]
-  tableData: any,
+  tableData: any[],
   totalItems: number
   handlePageClick: (e: { selected: number }) => void;
   query:string
