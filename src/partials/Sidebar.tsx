@@ -11,7 +11,12 @@ import {
 import routes from "./routes";
 import "./sidebar.scss";
 
-function Sidebar({ sidebarOpen, setSidebarOpen }: any) {
+interface SidebarProps {
+  sidebarOpen: boolean;
+  setSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ sidebarOpen, setSidebarOpen }) => {
   const [openTab, setOpenTab] = useState<string>("");
 
   const location = useLocation();
@@ -28,32 +33,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen }: any) {
     setOpenTab(tab === openTab ? "" : tab);
   };
 
-  // close on click outside
-  useEffect(() => {
-    const clickHandler = ({ target }: any) => {
-      if (!sidebar.current || !trigger.current) return;
-      if (
-        !sidebarOpen ||
-        sidebar.current.contains(target) ||
-        trigger.current.contains(target)
-      )
-        return;
-      setSidebarOpen(false);
-    };
-    document.addEventListener("click", clickHandler);
-    return () => document.removeEventListener("click", clickHandler);
-  });
-
-  // close if the esc key is pressed
-  useEffect(() => {
-    const keyHandler = ({ keyCode }: any) => {
-      if (!sidebarOpen || keyCode !== 27) return;
-      setSidebarOpen(false);
-    };
-    document.addEventListener("keydown", keyHandler);
-    return () => document.removeEventListener("keydown", keyHandler);
-  });
-
   useEffect(() => {
     localStorage.setItem("sidebar-expanded", JSON.stringify(sidebarExpanded));
     if (sidebarExpanded) {
@@ -67,17 +46,24 @@ function Sidebar({ sidebarOpen, setSidebarOpen }: any) {
     <div>
       {/* Sidebar backdrop (mobile only) */}
       <div
-        className={`fixed inset-0 bg-opacity-30 z-40 lg:hidden lg:z-auto transition-opacity duration-200 ${
+        className={`fixed inset-0 bg-opacity-30 z-10 lg:hidden lg:z-auto transition-opacity duration-200 ${
           sidebarOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         }`}
         aria-hidden="true"
+        onClick={() => setSidebarOpen(prev => !prev)}
       ></div>
 
       {/* Sidebar */}
+      {/* {sidebarOpen && (
+        <div
+          className="backdrop left-0 top-0 absolute z-10 h-screen w-screen bg-[#00000000]"
+          onClick={() => setSidebarOpen((prev) => !prev)}
+        ></div>
+      )} */}
       <div
         id="sidebar"
         ref={sidebar}
-        className={`flex flex-col bg-white border border-r-[#eee] overflow-x-hidden absolute z-40 left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-screen overflow-y-scroll lg:overflow-y-auto w-64 lg:w-20 lg:sidebar-expanded:!w-64 shrink-0 p-4 transition-all duration-200 ease-in-out ${
+        className={`flex flex-col bg-white border z-40 border-r-[#eee] overflow-x-hidden absolute left-0 top-0 lg:static lg:left-auto lg:top-auto lg:translate-x-0 h-screen overflow-y-scroll lg:overflow-y-auto w-64 lg:w-20 lg:sidebar-expanded:!w-64 shrink-0 p-4 transition-all duration-200 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-64"
         }`}
       >
@@ -296,6 +282,6 @@ function Sidebar({ sidebarOpen, setSidebarOpen }: any) {
       </div>
     </div>
   );
-}
+};
 
 export default Sidebar;

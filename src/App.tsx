@@ -9,7 +9,7 @@ import { RootState } from "./redux/store";
 import Four0Four from "./components/ErrorPage/404";
 
 const App = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
   const navigate = useNavigate();
   const token = useSelector((state: RootState) => state.auth.token);
 
@@ -17,13 +17,15 @@ const App = () => {
     if (!token) navigate("/auth");
   }, [token]);
 
+  console.log(sidebarOpen)
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <div className="relative flex flex-col flex-1 overflow-y-auto overflow-x-hidden">
-        <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+        <Header setSidebarOpen={setSidebarOpen} />
 
         <main className="flex-1">
           <div className="px-4 sm:px-6 lg:px-8 py-8 w-full h-full max-w-9xl mx-auto">
